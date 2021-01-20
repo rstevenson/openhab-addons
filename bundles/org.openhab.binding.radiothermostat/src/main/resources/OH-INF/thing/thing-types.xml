@@ -30,6 +30,8 @@
 			<channel id="today_cool_runtime" typeId="today_cool_runtime"/>
 			<channel id="yesterday_heat_runtime" typeId="yesterday_heat_runtime"/>
 			<channel id="yesterday_cool_runtime" typeId="yesterday_cool_runtime"/>
+			<channel id="remote_temperature" typeId="remote_temperature"/>
+			<channel id="remote_mode" typeId="remote_mode"/>
 		</channels>
 
 		<config-description>
@@ -211,6 +213,20 @@
 		<label>Yesterday's Cooling Runtime</label>
 		<description>The Number of Minutes of Cooling Run-time Yesterday</description>
 		<state readOnly="true" pattern="%d %unit%"/>
+	</channel-type>
+
+	<channel-type id="remote_temperature">
+		<item-type>Number</item-type>
+		<label>Remote Temperature</label>
+		<description>The Current Remote Temperature of the Thermostat</description>
+		<category>Temperature</category>
+		<state min="35" max="95" pattern="%d"/>
+	</channel-type>
+
+	<channel-type id="remote_mode">
+		<item-type>Number</item-type>
+		<label>Remote Mode</label>
+		<description>The Current Remote Operating Mode</description>
 	</channel-type>
 
 </thing:thing-descriptions>

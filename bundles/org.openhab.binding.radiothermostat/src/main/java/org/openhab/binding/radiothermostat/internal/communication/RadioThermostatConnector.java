@@ -107,8 +107,8 @@ public class RadioThermostatConnector {
      * @param the value to be updated in the thermostat
      * @return the JSON response string from the thermostat
      */
-    public String sendCommand(String cmdKey, @Nullable String cmdVal) {
-        return sendCommand(cmdKey, cmdVal, null);
+    public String sendCommand(String resourceURL, String cmdKey, @Nullable String cmdVal) {
+        return sendCommand(resourceURL, cmdKey, cmdVal, null);
     }
 
     /**
@@ -119,10 +119,11 @@ public class RadioThermostatConnector {
      * @param JSON string to send directly to the thermostat instead of a key/value pair
      * @return the JSON response string from the thermostat
      */
-    public String sendCommand(@Nullable String cmdKey, @Nullable String cmdVal, @Nullable String cmdJson) {
+    public String sendCommand(String resourceURL, @Nullable String cmdKey, @Nullable String cmdVal,
+            @Nullable String cmdJson) {
         // if we got a cmdJson string send that, otherwise build the json from the key and val params
         String postJson = cmdJson != null ? cmdJson : "{\"" + cmdKey + "\":" + cmdVal + "}";
-        String urlStr = buildRequestURL(DEFAULT_RESOURCE);
+        String urlStr = buildRequestURL(resourceURL);
 
         String output = "";
 

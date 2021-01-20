@@ -47,6 +47,7 @@ public class RadioThermostatBindingConstants {
     public static final String DEFAULT_RESOURCE = "tstat";
     public static final String RUNTIME_RESOURCE = "tstat/datalog";
     public static final String HUMIDITY_RESOURCE = "tstat/humidity";
+    public static final String REMOTE_RESOURCE = "tstat/remote_temp";
 
     // List of all Thing Type UIDs
     public static final ThingTypeUID THING_TYPE_RTHERM = new ThingTypeUID(BINDING_ID, "rtherm");
@@ -70,11 +71,14 @@ public class RadioThermostatBindingConstants {
     public static final String TODAY_COOL_RUNTIME = "today_cool_runtime";
     public static final String YESTERDAY_HEAT_RUNTIME = "yesterday_heat_runtime";
     public static final String YESTERDAY_COOL_RUNTIME = "yesterday_cool_runtime";
+    public static final String REMOTE_TEMPERATURE = "remote_temperature";
+    public static final String REMOTE_MODE = "remote_mode";
 
     public static final Set<ThingTypeUID> SUPPORTED_THING_TYPES_UIDS = Collections.singleton(THING_TYPE_RTHERM);
-    public static final Set<String> SUPPORTED_CHANNEL_IDS = Stream.of(TEMPERATURE, HUMIDITY, MODE, FAN_MODE,
-            PROGRAM_MODE, SET_POINT, OVERRIDE, HOLD, STATUS, FAN_STATUS, DAY, HOUR, MINUTE, DATE_STAMP,
-            TODAY_HEAT_RUNTIME, TODAY_COOL_RUNTIME, YESTERDAY_HEAT_RUNTIME, YESTERDAY_COOL_RUNTIME)
+    public static final Set<String> SUPPORTED_CHANNEL_IDS = Stream
+            .of(TEMPERATURE, HUMIDITY, MODE, FAN_MODE, PROGRAM_MODE, SET_POINT, OVERRIDE, HOLD, STATUS, FAN_STATUS, DAY,
+                    HOUR, MINUTE, DATE_STAMP, TODAY_HEAT_RUNTIME, TODAY_COOL_RUNTIME, YESTERDAY_HEAT_RUNTIME,
+                    YESTERDAY_COOL_RUNTIME, REMOTE_TEMPERATURE, REMOTE_MODE)
             .collect(Collectors.toSet());
 
     // Units of measurement of the data delivered by the API

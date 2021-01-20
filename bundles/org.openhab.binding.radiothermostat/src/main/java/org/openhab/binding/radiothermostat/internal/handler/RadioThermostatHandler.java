@@ -38,6 +38,7 @@ import org.openhab.binding.radiothermostat.internal.communication.RadioThermosta
 import org.openhab.binding.radiothermostat.internal.communication.RadioThermostatEventListener;
 import org.openhab.binding.radiothermostat.internal.dto.RadioThermostatDTO;
 import org.openhab.binding.radiothermostat.internal.dto.RadioThermostatHumidityDTO;
+import org.openhab.binding.radiothermostat.internal.dto.RadioThermostatRemoteDTO;
 import org.openhab.binding.radiothermostat.internal.dto.RadioThermostatRuntimeDTO;
 import org.openhab.binding.radiothermostat.internal.dto.RadioThermostatTstatDTO;
 import org.openhab.core.library.types.DateTimeType;
@@ -166,6 +167,9 @@ public class RadioThermostatHandler extends BaseThingHandler implements RadioThe
             Runnable runnable = () -> {
                 // send an async call to the thermostat to get the 'tstat' data
                 connector.getAsyncThermostatData(DEFAULT_RESOURCE);
+
+                // send an async call to the thermostat to get the Remote Temperature data
+                connector.getAsyncThermostatData(REMOTE_RESOURCE);
             };
 
             refreshJob = null;
@@ -216,7 +220,7 @@ public class RadioThermostatHandler extends BaseThingHandler implements RadioThe
     }
 
     public void handleRawCommand(@Nullable String rawCommand) {
-        connector.sendCommand(null, null, rawCommand);
+        connector.sendCommand(DEFAULT_RESOURCE, null, null, rawCommand);
     }
 
     @Override
@@ -240,7 +244,7 @@ public class RadioThermostatHandler extends BaseThingHandler implements RadioThe
                 case MODE:
                     // only do if commanded mode is different than current mode
                     if (!cmdInt.equals(rthermData.getThermostatData().getMode())) {
-                        connector.sendCommand("tmode", cmdStr);
+                        connector.sendCommand(DEFAULT_RESOURCE, "tmode", cmdStr);
 
                         // set the new operating mode, reset everything else,
                         // because refreshing the tstat data below is really slow.
@@ -260,19 +264,19 @@ public class RadioThermostatHandler extends BaseThingHandler implements RadioThe
                     break;
                 case FAN_MODE:
                     rthermData.getThermostatData().setFanMode(cmdInt);
-                    connector.sendCommand("fmode", cmdStr);
+                    connector.sendCommand(DEFAULT_RESOURCE, "fmode", cmdStr);
                     break;
                 case PROGRAM_MODE:
                     rthermData.getThermostatData().setProgramMode(cmdInt);
-                    connector.sendCommand("program_mode", cmdStr);
+                    connector.sendCommand(DEFAULT_RESOURCE, "program_mode", cmdStr);
                     break;
                 case HOLD:
                     if (command instanceof OnOffType && command == OnOffType.ON) {
                         rthermData.getThermostatData().setHold(1);
-                        connector.sendCommand("hold", "1");
+                        connector.sendCommand(DEFAULT_RESOURCE, "hold", "1");
                     } else if (command instanceof OnOffType && command == OnOffType.OFF) {
                         rthermData.getThermostatData().setHold(0);
-                        connector.sendCommand("hold", "0");
+                        connector.sendCommand(DEFAULT_RESOURCE, "hold", "0");
                     }
                     break;
                 case SET_POINT:
@@ -287,7 +291,15 @@ public class RadioThermostatHandler extends BaseThingHandler implements RadioThe
                         // don't do anything if we are not in heat or cool mode
                         break;
                     }
-                    connector.sendCommand(cmdKey, cmdInt.toString());
+                    connector.sendCommand(DEFAULT_RESOURCE, cmdKey, cmdInt.toString());
+                    break;
+                case REMOTE_MODE:
+                    rthermData.getRemote().setMode(cmdInt);
+                    connector.sendCommand(REMOTE_RESOURCE, "rem_mode", cmdInt.toString());
+                    break;
+                case REMOTE_TEMPERATURE:
+                    rthermData.getRemote().setTemperature(cmdInt);
+                    connector.sendCommand(REMOTE_RESOURCE, "rem_temp", cmdInt.toString());
                     break;
                 default:
                     logger.warn("Unsupported command: {}", command.toString());
@@ -329,6 +341,11 @@ public class RadioThermostatHandler extends BaseThingHandler implements RadioThe
                     updateChannel(TODAY_COOL_RUNTIME, rthermData);
                     updateChannel(YESTERDAY_HEAT_RUNTIME, rthermData);
                     updateChannel(YESTERDAY_COOL_RUNTIME, rthermData);
+                    break;
+                case REMOTE_RESOURCE:
+                    rthermData.setRemote(gson.fromJson(evtVal, RadioThermostatRemoteDTO.class));
+                    updateChannel(REMOTE_MODE, rthermData);
+                    updateChannel(REMOTE_TEMPERATURE, rthermData);
                     break;
             }
         }
@@ -440,6 +457,14 @@ public class RadioThermostatHandler extends BaseThingHandler implements RadioThe
             case YESTERDAY_COOL_RUNTIME:
                 return new QuantityType<>(data.getRuntime().getYesterday().getCoolTime().getRuntime(),
                         API_MINUTES_UNIT);
+            case REMOTE_MODE:
+                return data.getRemote().getMode();
+            case REMOTE_TEMPERATURE:
+                if (data.getRemote().getTemperature() != 0) {
+                    return new QuantityType<Temperature>(data.getRemote().getTemperature(), API_TEMPERATURE_UNIT);
+                } else {
+                    return null;
+                }
         }
         return null;
     }

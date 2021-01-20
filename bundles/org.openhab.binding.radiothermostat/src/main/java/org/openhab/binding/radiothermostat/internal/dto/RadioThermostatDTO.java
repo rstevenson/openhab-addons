@@ -22,6 +22,7 @@ public class RadioThermostatDTO {
     private RadioThermostatTstatDTO thermostatData;
     private Integer humidity;
     private RadioThermostatRuntimeDTO runtime;
+    private RadioThermostatRemoteDTO remote;
 
     public RadioThermostatDTO() {
     }
@@ -48,5 +49,13 @@ public class RadioThermostatDTO {
 
     public void setRuntime(RadioThermostatRuntimeDTO runtime) {
         this.runtime = runtime;
+    }
+
+    public RadioThermostatRemoteDTO getRemote() {
+        return remote;
+    }
+
+    public void setRemote(RadioThermostatRemoteDTO remote) {
+        this.remote = remote;
     }
 }
